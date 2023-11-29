@@ -4,6 +4,7 @@
   "description": "Free fancies around music",
   "main": "index.js",
   "scripts": {
+    "env:dev": "docker run -w /home/dev/music --rm -it -v fork-env:/home/dev/.dev -v fork-npm-cache:/home/dev/.npm -v .:/home/dev/music --name dev 8002615/dev || true",
     "test": "test"
   },
   "repository": {
