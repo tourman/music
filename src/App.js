@@ -1,24 +1,19 @@
-import logo from './logo.svg';
 import './App.css';
+import { Container, Grid, Header } from 'semantic-ui-react';
+import Search from './components/Search';
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Grid padded>
+      <Grid.Column>
+        <Grid.Row>
+          <Container>
+            <Header as="h1">Interested in music?</Header>
+            <Search />
+          </Container>
+        </Grid.Row>
+      </Grid.Column>
+    </Grid>
   );
 }
 
