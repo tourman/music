@@ -2,16 +2,30 @@
   "name": "music",
   "version": "1.0.0",
   "description": "Free fancies around music",
-  "main": "index.js",
+  "dependencies": {
+    "@testing-library/jest-dom": "^5.17.0",
+    "@testing-library/react": "^13.4.0",
+    "@testing-library/user-event": "^13.5.0",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-scripts": "5.0.1",
+    "web-vitals": "^2.1.4"
+  },
   "scripts": {
     "env:dev": "docker run -w /home/dev/music --rm -it -v fork-env:/home/dev/.dev -v fork-npm-cache:/home/dev/.npm -v .:/home/dev/music --name dev 8002615/dev || true",
-    "test": "test"
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+ssh://git@github.com/tourman/music.git"
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ]
   },
   "keywords": [
+    "react",
     "music"
   ],
   "author": "tourman",
@@ -19,5 +33,16 @@
   "bugs": {
     "url": "https://github.com/tourman/music/issues"
   },
-  "homepage": "https://github.com/tourman/music#readme"
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }
