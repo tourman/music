@@ -1,0 +1,4 @@
+#!/bin/bash
+
+pict model.pict /e:./combinations | tee /tmp/combinations | column -t | nl -v 0
+mv /tmp/combinations .

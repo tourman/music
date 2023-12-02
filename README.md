@@ -18,3 +18,4 @@
 - [ ] `#tech` Research why `.then(() => { throw Error() })` bypasses the regular flow and makes `componentDidCatch()` to catch a react element.
 - [ ] `#tech` Play with priority of the thread tasks.
 - [ ] `#tech` How to combine the `scheduler` with the scheduler of React? Does it make any sense?
+- [ ] `#tech` Solve the bypass in the tests.

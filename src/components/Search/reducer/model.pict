@@ -1,0 +1,87 @@
+# states (s): display (d), network (n), debounce timer (t)
+# display states: input (i), results (r), status (s), error message (e)
+SDIValue:     empty, query-a
+SDIStatus:    idle, loading, error
+SDRData:      empty, query-a, query-b, skeleton
+SDSLoading:   true, false
+SDEMessage:   true, false
+SNRequest:    -, query-a, query-b
+STStatus:     -, query-a
+# display actions: QUERY
+# network actions: SUCCESS, ERROR
+# debounce timer actions: DEBOUNCE
+Action:       QUERY, SUCCESS, ERROR, DEBOUNCE
+# Payloads
+AQuery:       -, empty, query-a, query-b
+ASuccess:     -, empty, full
+
+# Avoiding mirror repetitions
+if [SNRequest] = "query-b" then [SDRData] <> "query-b";
+if [AQuery] = "query-b" then [SNRequest] <> "query-b";
+
+# Adjusting error
+if [SDEMessage] = "true" then [SDIStatus] = "error";
+if [SDEMessage] <> "true" then [SDIStatus] <> "error";
+if [SDIValue] = "empty" then [SDIStatus] <> "error";
+# Once we change the value no need to show the error more
+if [STStatus] <> "-" then [SDIStatus] <> "error";
+if [SDIValue] = "query-a" and [SDRData] = [SDIValue] and [STStatus] = "-" then
+  [SDIStatus] <> "error";
+
+# Adjusting actions
+if [Action] = "QUERY" then
+  [AQuery] <> "-" and
+  [ASuccess] = "-";
+if [Action] = "SUCCESS" then
+  [AQuery] = "-" and
+  [ASuccess] <> "-";
+if [Action] = "ERROR" then
+  [AQuery] = "-" and
+  [ASuccess] = "-";
+if [Action] = "DEBOUNCE" then
+  [AQuery] = "-" and
+  [ASuccess] = "-";
+
+# Adjust actions with statuses
+if ([Action] = "SUCCESS" or [Action] = "ERROR") then [SNRequest] <> "-";
+if [Action] = "DEBOUNCE" then [STStatus] <> "-";
+if [AQuery] <> "-" then [SDIValue] <> [AQuery];
+
+# Adjusting loading
+if [SDIStatus] = "loading" then
+  (
+    [SDRData] = "skeleton"
+    or
+    [SDSLoading] = "true"
+  ) and
+  [SNRequest] <> "-";
+if [SDIStatus] <> "loading" then
+  [SDRData] <> "skeleton" and
+  [SDSLoading] <> "true" and
+  [SNRequest] = "-";
+if [SDSLoading] = "true" then [SDRData] <> "skeleton";
+# Once we clear the search string there will be no request
+if [SDIValue] = "empty" then [SNRequest] = "-";
+# No need to load if the query equals to the result
+if [SDIValue] <> "empty" and [SDRData] = [SDIValue] then
+  [SDIStatus] <> "loading";
+# If data is empty it must show the skeleton
+if [SDIStatus] = "loading" then [SDRData] <> "empty";
+
+# Adjusting debounce
+if [SDIValue] = "empty" then [STStatus] = "-";
+# No need to debounce if we return to the same query as has the result
+if [SDIValue] = [SDRData] then [STStatus] = "-";
+# No need to debounce if we have the same request
+if [SNRequest] <> "-" then [STStatus] <> [SNRequest];
+
+# Adjusting data
+if [SDIValue] = "empty" then [SDRData] = "empty";
+if [SDIValue] = "query-a" and [SNRequest] = "query-b" and [SDRData] = "skeleton" then
+  [STStatus] <> "-";
+
+# Fine-grained exclusions
+if [SDIValue] = "query-a" and [SDIStatus] <> "loading" and [SDRData] = "query-b" then
+  [STStatus] <> "-";
+if [SDIValue] = "query-a" and [SDRData] = "query-b" and [STStatus] = "query-a" then
+  [SDIStatus] <> "error";
