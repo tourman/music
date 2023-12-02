@@ -70,7 +70,7 @@ async function combinations2JSON(defaultCombinations) {
         {},
       ),
     );
-  console.log(JSON.stringify(testCases));
+  console.log(JSON.stringify(testCases, null, 2));
 }
 
 if (require.main.filename === __filename) {

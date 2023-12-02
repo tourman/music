@@ -4,7 +4,7 @@ SDIValue:     empty, query-a
 SDIStatus:    idle, loading, error
 SDRData:      empty, query-a, query-b, skeleton
 SDSLoading:   true, false
-SDEMessage:   true, false
+SDEMessage:   -, query-a, query-b
 SNRequest:    -, query-a, query-b
 STStatus:     -, query-a
 # display actions: QUERY
@@ -15,18 +15,35 @@ Action:       QUERY, SUCCESS, ERROR, DEBOUNCE
 AQuery:       -, empty, query-a, query-b
 ASuccess:     -, empty, full
 
+# Combination to check out
+# SDIValue:     query-a
+# SDIStatus:    error
+# SDRData:      empty
+# SDSLoading:   false
+# SDEMessage:   query-b
+# SNRequest:    -
+# STStatus:     query-a
+# Action:       DEBOUNCE
+# AQuery:       -
+# ASuccess:     -
+
 # Avoiding mirror repetitions
-if [SNRequest] = "query-b" then [SDRData] <> "query-b";
+if [SDEMessage] = "query-b" then [SDRData] <> "query-b";
+if [SNRequest] = "query-b" then [SDEMessage] <> "query-b";
 if [AQuery] = "query-b" then [SNRequest] <> "query-b";
 
 # Adjusting error
-if [SDEMessage] = "true" then [SDIStatus] = "error";
-if [SDEMessage] <> "true" then [SDIStatus] <> "error";
+if [SDEMessage] <> "-" then [SDIStatus] = "error";
+if [SDEMessage] = "-" then [SDIStatus] <> "error";
 if [SDIValue] = "empty" then [SDIStatus] <> "error";
 # Once we change the value no need to show the error more
-if [STStatus] <> "-" then [SDIStatus] <> "error";
+# if [STStatus] <> "-" then [SDIStatus] <> "error";
 if [SDIValue] = "query-a" and [SDRData] = [SDIValue] and [STStatus] = "-" then
   [SDIStatus] <> "error";
+if [SDIValue] = "query-a" and [SDEMessage] = "query-b" then
+  [STStatus] <> "-";
+if [SDIValue] = "query-a" and [SDEMessage] = [SDIValue] then
+  [STStatus] = "-";
 
 # Adjusting actions
 if [Action] = "QUERY" then
@@ -67,6 +84,8 @@ if [SDIValue] <> "empty" and [SDRData] = [SDIValue] then
   [SDIStatus] <> "loading";
 # If data is empty it must show the skeleton
 if [SDIStatus] = "loading" then [SDRData] <> "empty";
+# It doesn't make sense to load the data that is displayed
+if ([SDRData] = "query-a" or [SDRData] = "query-b") then [SNRequest] <> [SDRData];
 
 # Adjusting debounce
 if [SDIValue] = "empty" then [STStatus] = "-";
