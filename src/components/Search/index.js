@@ -92,10 +92,10 @@ Search.defaultProps = {
   request: (() => {
     let currentQuery;
     return (query, onSuccess = () => {}, onError = () => {}) => {
+      currentQuery = query;
       if (!query) {
         return onSuccess([]);
       }
-      currentQuery = query;
       const url = `https://deezerdevs-deezer.p.rapidapi.com/search?q=${encodeURIComponent(
         query,
       )}`;

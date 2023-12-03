@@ -27,8 +27,22 @@ function get(obj, entity) {
   }
 }
 
+const debug = (() => {
+  if (process.env.NODE_ENV !== 'development') {
+    return () => {};
+  }
+  const cache = new WeakSet();
+  return (state, action, result) => {
+    if (cache.has(state)) {
+      return;
+    }
+    cache.add(state);
+    console.log({ state, action, result });
+  };
+})();
+
 export default function reducer(state, action) {
-  return produce(state, draft => {
+  const result = produce(state, draft => {
     const { type, payload, query, error } = action;
     if (type === QUERY) {
       draft.display.input.value = query;
@@ -91,4 +105,6 @@ export default function reducer(state, action) {
       }
     }
   });
+  debug(state, action, result);
+  return result;
 }
