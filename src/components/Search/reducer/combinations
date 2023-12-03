@@ -26,3 +26,11 @@ query-a	error	empty	false	query-b	-	query-a	false	false	QUERY	empty	-
 query-a	error	empty	false	query-b	-	query-a	false	false	QUERY	query-b	-
 query-a	loading	skeleton	false	-	query-a	-	false	false	ERROR	-	-
 query-a	error	empty	false	query-b	-	query-a	false	false	DEBOUNCE	-	-
+query-a	idle	empty	false	-	-	query-a	false	true	DEBOUNCE	-	-
+query-a	idle	query-a	false	-	-	-	true	true	QUERY	empty	-
+empty	idle	empty	false	-	-	-	true	false	QUERY	query-b	-
+query-a	loading	query-b	true	-	query-a	-	false	true	SUCCESS	-	empty
+empty	idle	empty	false	-	-	-	true	true	QUERY	query-a	-
+query-a	error	empty	false	query-a	-	-	false	true	QUERY	empty	-
+query-a	loading	skeleton	false	-	query-a	-	false	true	ERROR	-	-
+query-a	loading	skeleton	false	-	query-a	-	false	true	SUCCESS	-	full

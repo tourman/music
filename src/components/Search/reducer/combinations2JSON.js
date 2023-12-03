@@ -24,6 +24,13 @@ function set(obj, path, rawValue) {
   if (rawValue === 'empty') {
     value = '';
   }
+  const cacheMatch = path.match(/^state\.cache\.(query-.)$/);
+  if (cacheMatch) {
+    if (!value) {
+      return obj;
+    }
+    value = `cache-${cacheMatch[1]}`;
+  }
   let current = obj;
   for (const key of keys.slice(0, -1)) {
     if (!(key in current)) {
@@ -43,6 +50,8 @@ const key2StatePath = {
   SDEMessage: 'state.display.error',
   SNRequest: 'state.network.request',
   STStatus: 'state.timer.debounce',
+  SCacheQueryA: 'state.cache.query-a',
+  SCacheQueryB: 'state.cache.query-b',
   Action: 'action.type',
   AQuery: 'action.query',
   ASuccess: 'action.payload',

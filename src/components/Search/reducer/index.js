@@ -56,6 +56,13 @@ export default function reducer(state, action) {
         draft.display.error = null;
         draft.network.request = null;
         draft.timer.debounce = null;
+      } else if (state.cache[query]) {
+        draft.display.input.status = 'idle';
+        setResult(draft, query, state.cache[query]);
+        draft.display.status.loading = false;
+        draft.display.error = null;
+        draft.network.request = null;
+        draft.timer.debounce = null;
       } else if (
         [state.display.result?.query, state.display.error?.query].includes(
           query,
@@ -79,6 +86,9 @@ export default function reducer(state, action) {
         state.network.request &&
         state.timer.debounce &&
         state.network.request !== state.timer.debounce;
+      if (type === SUCCESS) {
+        draft.cache[state.network.request] = payload;
+      }
       if (isQueue) {
         draft.network.request = state.timer.debounce;
         if (typeof state.display.result === 'string') {

@@ -128,7 +128,7 @@ describe('Search: reducer', () => {
       },
       action: { type: SUCCESS, payload: [] },
       expected: {
-        cache: {},
+        cache: { 'query-a': [] },
         display: {
           input: { value: 'query-a', status: 'idle' },
           result: { query: 'query-a', items: [] },
@@ -278,7 +278,7 @@ describe('Search: reducer', () => {
       },
       action: { type: SUCCESS, payload: results['query-b'] },
       expected: {
-        cache: {},
+        cache: { 'query-b': results['query-b'] },
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: 'query-a',
@@ -403,7 +403,7 @@ describe('Search: reducer', () => {
       },
       action: { type: SUCCESS, payload: [] },
       expected: {
-        cache: {},
+        cache: { 'query-b': [] },
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: 'query-a',
@@ -531,7 +531,7 @@ describe('Search: reducer', () => {
       },
       action: { type: SUCCESS, payload: results['query-a'] },
       expected: {
-        cache: {},
+        cache: { 'query-a': results['query-a'] },
         display: {
           input: { value: 'query-a', status: 'idle' },
           result: { query: 'query-a', items: results['query-a'] },
@@ -693,6 +693,207 @@ describe('Search: reducer', () => {
         },
         network: { request: 'query-a' },
         timer: { debounce: null },
+      },
+    },
+    // after adding cache
+    {
+      state: {
+        display: {
+          input: { value: 'query-a', status: 'idle' },
+          result: { query: '', items: [] },
+          status: { loading: false },
+          error: null,
+        },
+        network: { request: null },
+        timer: { debounce: 'query-a' },
+        cache: { 'query-b': results['query-b'] },
+      },
+      action: { type: DEBOUNCE },
+      expected: {
+        display: {
+          input: { value: 'query-a', status: 'loading' },
+          result: 'query-a',
+          status: { loading: false },
+          error: null,
+        },
+        network: { request: 'query-a' },
+        timer: { debounce: null },
+        cache: { 'query-b': results['query-b'] },
+      },
+    },
+    {
+      state: {
+        display: {
+          input: { value: 'query-a', status: 'idle' },
+          result: 'query-a',
+          status: { loading: false },
+          error: null,
+        },
+        network: { request: null },
+        timer: { debounce: null },
+        cache: { 'query-a': results['query-a'], 'query-b': results['query-b'] },
+      },
+      action: { type: QUERY, query: '' },
+      expected: {
+        display: {
+          input: { value: '', status: 'idle' },
+          result: { query: '', items: [] },
+          status: { loading: false },
+          error: null,
+        },
+        network: { request: null },
+        timer: { debounce: null },
+        cache: { 'query-a': results['query-a'], 'query-b': results['query-b'] },
+      },
+    },
+    {
+      state: {
+        display: {
+          input: { value: '', status: 'idle' },
+          result: '',
+          status: { loading: false },
+          error: null,
+        },
+        network: { request: null },
+        timer: { debounce: null },
+        cache: { 'query-a': results['query-a'] },
+      },
+      action: { type: QUERY, query: 'query-b' },
+      expected: {
+        display: {
+          input: { value: 'query-b', status: 'idle' },
+          result: '',
+          status: { loading: false },
+          error: null,
+        },
+        network: { request: null },
+        timer: { debounce: 'query-b' },
+        cache: { 'query-a': results['query-a'] },
+      },
+    },
+    {
+      state: {
+        display: {
+          input: { value: 'query-a', status: 'loading' },
+          result: 'query-b',
+          status: { loading: true },
+          error: null,
+        },
+        network: { request: 'query-a' },
+        timer: { debounce: null },
+        cache: { 'query-b': results['query-b'] },
+      },
+      action: { type: SUCCESS, payload: [] },
+      expected: {
+        display: {
+          input: { value: 'query-a', status: 'idle' },
+          result: { query: 'query-a', items: [] },
+          status: { loading: false },
+          error: null,
+        },
+        network: { request: null },
+        timer: { debounce: null },
+        cache: { 'query-a': [], 'query-b': results['query-b'] },
+      },
+    },
+    {
+      state: {
+        display: {
+          input: { value: '', status: 'idle' },
+          result: { query: '', items: [] },
+          status: { loading: false },
+          error: null,
+        },
+        network: { request: null },
+        timer: { debounce: null },
+        cache: { 'query-a': results['query-a'], 'query-b': results['query-b'] },
+      },
+      action: { type: QUERY, query: 'query-a' },
+      expected: {
+        display: {
+          input: { value: 'query-a', status: 'idle' },
+          result: { query: 'query-a', items: results['query-a'] },
+          status: { loading: false },
+          error: null,
+        },
+        network: { request: null },
+        timer: { debounce: null },
+        cache: { 'query-a': results['query-a'], 'query-b': results['query-b'] },
+      },
+    },
+    {
+      state: {
+        display: {
+          input: { value: 'query-a', status: 'error' },
+          result: { query: 'query-a', items: [] },
+          status: { loading: false },
+          error: { query: 'query-a', instance: errors['query-a'] },
+        },
+        network: { request: null },
+        timer: { debounce: null },
+        cache: { 'query-b': results['query-b'] },
+      },
+      action: { type: QUERY, query: '' },
+      expected: {
+        display: {
+          input: { value: '', status: 'idle' },
+          result: { query: '', items: [] },
+          status: { loading: false },
+          error: null,
+        },
+        network: { request: null },
+        timer: { debounce: null },
+        cache: { 'query-b': results['query-b'] },
+      },
+    },
+    {
+      state: {
+        display: {
+          input: { value: 'query-a', status: 'loading' },
+          result: 'query-a',
+          status: { loading: false },
+          error: null,
+        },
+        network: { request: 'query-a' },
+        timer: { debounce: null },
+        cache: { 'query-b': results['query-b'] },
+      },
+      action: { type: ERROR, error: errors['query-a'] },
+      expected: {
+        display: {
+          input: { value: 'query-a', status: 'error' },
+          result: { query: 'query-a', items: [] },
+          status: { loading: false },
+          error: { query: 'query-a', instance: errors['query-a'] },
+        },
+        network: { request: null },
+        timer: { debounce: null },
+        cache: { 'query-b': results['query-b'] },
+      },
+    },
+    {
+      state: {
+        display: {
+          input: { value: 'query-a', status: 'loading' },
+          result: 'query-a',
+          status: { loading: false },
+          error: null,
+        },
+        network: { request: 'query-a' },
+        timer: { debounce: null },
+        cache: { 'query-b': results['query-b'] },
+      },
+      action: { type: SUCCESS, payload: results['query-a'] },
+      expected: {
+        display: {
+          input: { value: 'query-a', status: 'idle' },
+          result: { query: 'query-a', items: results['query-a'] },
+          status: { loading: false },
+          error: null,
+        },
+        network: { request: null },
+        timer: { debounce: null },
+        cache: { 'query-a': results['query-a'], 'query-b': results['query-b'] },
       },
     },
   ])('%#', ({ action, state, expected, prop }) => {

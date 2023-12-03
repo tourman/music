@@ -7,8 +7,8 @@ SDSLoading:   true, false
 SDEMessage:   -, query-a, query-b
 SNRequest:    -, query-a, query-b
 STStatus:     -, query-a
-SCacheQueryA: false
-SCacheQueryB: false
+SCacheQueryA: false, true
+SCacheQueryB: false, true
 # display actions: QUERY
 # network actions: SUCCESS, ERROR
 # debounce timer actions: DEBOUNCE
@@ -33,6 +33,7 @@ ASuccess:     -, empty, full
 if [SDEMessage] = "query-b" then [SDRData] <> "query-b";
 if [SNRequest] = "query-b" then [SDEMessage] <> "query-b";
 if [AQuery] = "query-b" then [SNRequest] <> "query-b";
+if [SCacheQueryB] = "true" then [AQuery] <> "query-b";
 
 # Adjusting error
 if [SDEMessage] <> "-" then [SDIStatus] = "error";
@@ -46,6 +47,8 @@ if [SDIValue] = "query-a" and [SDEMessage] = "query-b" then
   [STStatus] <> "-";
 if [SDIValue] = "query-a" and [SDEMessage] = [SDIValue] then
   [STStatus] = "-";
+if [SCacheQueryA] = "true" then [SDEMessage] <> "query-a";
+if [SCacheQueryB] = "true" then [SDEMessage] <> "query-b";
 
 # Adjusting actions
 if [Action] = "QUERY" then
@@ -88,6 +91,8 @@ if [SDIValue] <> "empty" and [SDRData] = [SDIValue] then
 if [SDIStatus] = "loading" then [SDRData] <> "empty";
 # It doesn't make sense to load the data that is displayed
 if ([SDRData] = "query-a" or [SDRData] = "query-b") then [SNRequest] <> [SDRData];
+if [SCacheQueryA] = "true" then [SNRequest] <> "query-a";
+if [SCacheQueryB] = "true" then [SNRequest] <> "query-b";
 
 # Adjusting debounce
 if [SDIValue] = "empty" then [STStatus] = "-";
@@ -95,6 +100,8 @@ if [SDIValue] = "empty" then [STStatus] = "-";
 if [SDIValue] = [SDRData] then [STStatus] = "-";
 # No need to debounce if we have the same request
 if [SNRequest] <> "-" then [STStatus] <> [SNRequest];
+if [SCacheQueryA] = "true" then [STStatus] <> "query-a";
+if [SCacheQueryB] = "true" then [STStatus] <> "query-b";
 
 # Adjusting data
 if [SDIValue] = "empty" then [SDRData] = "empty";

@@ -1,6 +1,5 @@
 import {
   Dimmer,
-  Header,
   Icon,
   Input,
   Item,

@@ -4,8 +4,9 @@ import reducer from './reducer';
 import { DEBOUNCE, ERROR, QUERY, SUCCESS } from './reducer/types';
 import PropTypes from 'prop-types';
 
-export default function Search({ debounce, request }) {
+export default function Search({ debounce, request, cache }) {
   const [state, dispatch] = useReducer(reducer, {
+    cache: cache.get(),
     display: {
       input: { value: '', status: 'idle' },
       result: { query: '', items: [] },
@@ -58,6 +59,11 @@ export default function Search({ debounce, request }) {
     );
     return () => request();
   }, [request, query]);
+
+  const { cache: cacheValue } = state;
+  useEffect(() => {
+    cache.set(cacheValue);
+  }, [cache, cacheValue]);
 
   return (
     <View
@@ -136,6 +142,24 @@ Search.defaultProps = {
             onError(error);
           },
         );
+    };
+  })(),
+  cache: ((cacheKey = 'cache') => {
+    return {
+      get: () => {
+        try {
+          return JSON.parse(localStorage.getItem(cacheKey)) || {};
+        } catch (error) {
+          return {};
+        }
+      },
+      set: value => {
+        requestIdleCallback(() => {
+          try {
+            localStorage.setItem(cacheKey, JSON.stringify(value));
+          } catch (error) {}
+        });
+      },
     };
   })(),
 };
