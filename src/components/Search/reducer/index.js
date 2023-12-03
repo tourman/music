@@ -1,31 +1,52 @@
 import { produce } from 'immer';
 import { DEBOUNCE, ERROR, QUERY, SUCCESS } from './types';
 
-function setLoading(state, draft, request) {
-  draft.network.request = request;
+function setLoading(state, draft) {
+  draft.network.request = state.timer.debounce;
   draft.display.input.status = 'loading';
   draft.display.status.loading =
-    state.display.result && state.display.result !== 'skeleton' ? true : false;
-  draft.display.result = state.display.result
+    Array.isArray(state.display.result) && state.display.result.length > 0;
+  draft.display.result = state.display.result.length
     ? state.display.result
     : 'skeleton';
   draft.display.error = null;
 }
 
+function unset(obj) {
+  for (const key of Object.keys(obj)) {
+    delete obj[key];
+  }
+  return obj;
+}
+
+function get(obj, entity) {
+  for (const key of Object.keys(obj)) {
+    if (obj[key] === entity) {
+      return key;
+    }
+  }
+}
+
 export default function reducer(state, action) {
-  console.log({ state, action });
   return produce(state, draft => {
-    const { type, payload, query } = action;
+    const { type, payload, query, error } = action;
     if (type === QUERY) {
       draft.display.input.value = query;
       if (query === '') {
+        unset(draft.inner.results);
+        unset(draft.inner.errors);
         draft.display.input.status = 'idle';
-        draft.display.result = '';
+        draft.display.result = [];
         draft.display.status.loading = false;
         draft.display.error = null;
         draft.network.request = null;
         draft.timer.debounce = null;
-      } else if ([state.display.result, state.display.error].includes(query)) {
+      } else if (
+        [
+          get(state.inner.results, state.display.result),
+          get(state.inner.errors, state.display.error),
+        ].includes(query)
+      ) {
         draft.display.input.status =
           state.display.input.status === 'loading'
             ? 'idle'
@@ -40,6 +61,10 @@ export default function reducer(state, action) {
       setLoading(state, draft, state.timer.debounce);
       draft.timer.debounce = null;
     } else {
+      unset(type === SUCCESS ? draft.inner.results : draft.inner.errors);
+      draft.inner[type === SUCCESS ? 'results' : 'errors'][
+        state.network.request
+      ] = type === SUCCESS ? payload : error;
       const isQueue =
         state.network.request &&
         state.timer.debounce &&
@@ -49,7 +74,7 @@ export default function reducer(state, action) {
         draft.timer.debounce = null;
       } else if (type === SUCCESS) {
         draft.display.input.status = 'idle';
-        draft.display.result = payload === 'full' ? state.network.request : '';
+        draft.display.result = payload;
         draft.display.status.loading = false;
         draft.display.error = null;
         draft.network.request = null;
@@ -57,7 +82,10 @@ export default function reducer(state, action) {
       } else if (type === ERROR) {
         draft.display.input.status = 'error';
         draft.display.status.loading = false;
-        draft.display.error = state.network.request;
+        draft.display.result = Array.isArray(state.display.result)
+          ? state.display.result
+          : [];
+        draft.display.error = error;
         draft.network.request = null;
         draft.timer.debounce = null;
       }

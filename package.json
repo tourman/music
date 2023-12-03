@@ -19,12 +19,16 @@
     "env:dev": "docker run -w /home/dev/music --rm -it -v fork-env:/home/dev/.dev -v fork-npm-cache:/home/dev/.npm -v .:/home/dev/music --name dev 8002615/dev || true",
     "env:start": "docker run -w /home/dev/music --rm -it -v fork-env:/home/dev/.dev -v fork-npm-cache:/home/dev/.npm -v .:/home/dev/music --name start -p 3000:3000 8002615/dev || true",
     "env:test": "docker run -w /home/dev/music --rm -it -v fork-env:/home/dev/.dev -v fork-npm-cache:/home/dev/.npm -v .:/home/dev/music --name test 8002615/dev || true",
+    "pict:search": "cd src/components/Search/reducer && ./pict || true",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },
   "eslintConfig": {
+    "rules": {
+      "no-console": 1
+    },
     "extends": [
       "react-app",
       "react-app/jest"

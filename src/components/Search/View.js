@@ -45,6 +45,7 @@ function ErrorMessage({ error }) {
   );
 }
 
+// eslint-disable-next-line no-unused-vars
 function defaultItem() {
   return (
     <Item>
@@ -73,10 +74,10 @@ function defaultItem() {
   );
 }
 
-function Result({ items, loading }) {
+function Result({ result, loading }) {
   return (
     <Item.Group>
-      {items.map(({ id, title, artist, album, duration }) => (
+      {result.map(({ id, title, artist, album, duration }) => (
         <Item key={id}>
           <Item.Image size="small" src={album.cover_medium} />
           <Item.Content>
@@ -105,7 +106,6 @@ export default function Search({
   inputStatus,
   onChange,
   result,
-  items,
   loading,
   error,
 }) {
@@ -123,8 +123,8 @@ export default function Search({
       {error && <ErrorMessage error={error} />}
       {result === 'skeleton' ? (
         <Fallback />
-      ) : items.length ? (
-        <Result {...{ items, loading }} />
+      ) : result.length ? (
+        <Result {...{ result, loading }} />
       ) : null}
     </Segment>
   );
@@ -133,16 +133,24 @@ export default function Search({
 Search.propTypes = {
   value: PropTypes.string.isRequired,
   inputStatus: PropTypes.oneOf(['idle', 'loading', 'error']).isRequired,
-  result: PropTypes.string.isRequired,
-  items: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.number.isRequired,
-      title: PropTypes.string.isRequired,
-      artist: PropTypes.string.isRequired,
-      album: PropTypes.string.isRequired,
-      duration: PropTypes.string.isRequired,
-    }),
-  ).isRequired,
+  result: PropTypes.oneOfType([
+    PropTypes.oneOf(['skeleton']),
+    PropTypes.arrayOf(
+      PropTypes.shape({
+        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+          .isRequired,
+        title: PropTypes.string.isRequired,
+        artist: PropTypes.shape({
+          name: PropTypes.string.isRequired,
+        }).isRequired,
+        album: PropTypes.shape({
+          title: PropTypes.string.isRequired,
+          cover_medium: PropTypes.string.isRequired,
+        }).isRequired,
+        duration: PropTypes.number.isRequired,
+      }),
+    ),
+  ]).isRequired,
   loading: PropTypes.bool.isRequired,
   error: PropTypes.instanceOf(Error),
   onChange: PropTypes.func.isRequired,

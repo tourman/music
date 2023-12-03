@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useReducer, useRef } from 'react';
+import { useCallback, useEffect, useReducer } from 'react';
 import View from './View';
 import reducer from './reducer';
 import { DEBOUNCE, ERROR, QUERY, SUCCESS } from './reducer/types';
@@ -6,9 +6,10 @@ import PropTypes from 'prop-types';
 
 export default function Search({ debounce, request }) {
   const [state, dispatch] = useReducer(reducer, {
+    inner: { results: {}, errors: {} },
     display: {
       input: { value: '', status: 'idle' },
-      result: '',
+      result: [],
       status: { loading: false },
       error: null,
     },
@@ -31,7 +32,6 @@ export default function Search({ debounce, request }) {
     timer: { debounce: debouncedValue },
   } = state;
   useEffect(() => {
-    console.log({ debouncedValue });
     if (!debouncedValue) {
       debounce(() => {});
       return () => {};
@@ -40,8 +40,6 @@ export default function Search({ debounce, request }) {
     return () => debounce(() => {});
   }, [debounce, debouncedValue]);
 
-  const itemsRef = useRef({ '': [] });
-  const errorRef = useRef({});
   const {
     network: { request: query },
   } = state;
@@ -52,13 +50,10 @@ export default function Search({ debounce, request }) {
     }
     request(
       query,
-      data => {
-        itemsRef.current[query] = data;
-        dispatch({ type: SUCCESS, payload: data.length ? 'full' : '' });
-      },
+      data => dispatch({ type: SUCCESS, payload: data }),
       error => {
-        errorRef.current[query] = error;
-        dispatch({ type: ERROR });
+        console.error(error);
+        dispatch({ type: ERROR, error });
       },
     );
     return () => request();
@@ -70,9 +65,8 @@ export default function Search({ debounce, request }) {
         value,
         inputStatus,
         result,
-        items: itemsRef.current[result],
         loading,
-        error: errorRef.current[error],
+        error,
         onChange,
       }}
     />

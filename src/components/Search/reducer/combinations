@@ -24,4 +24,5 @@ query-a	error	empty	false	query-a	-	-	QUERY	empty	-
 query-a	idle	query-a	false	-	-	-	QUERY	query-b	-
 query-a	error	empty	false	query-b	-	query-a	QUERY	empty	-
 query-a	error	empty	false	query-b	-	query-a	QUERY	query-b	-
+query-a	loading	skeleton	false	-	query-a	-	ERROR	-	-
 query-a	error	empty	false	query-b	-	query-a	DEBOUNCE	-	-
