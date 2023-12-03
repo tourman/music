@@ -13,6 +13,7 @@ function setLoading(state, draft, request) {
 }
 
 export default function reducer(state, action) {
+  console.log({ state, action });
   return produce(state, draft => {
     const { type, payload, query } = action;
     if (type === QUERY) {
