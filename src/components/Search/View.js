@@ -1,4 +1,5 @@
 import {
+  Dimmer,
   Icon,
   Input,
   Item,
@@ -86,7 +87,10 @@ function transformDuration(duration) {
 
 function Result({ result, loading }) {
   return (
-    <Item.Group>
+    <Dimmer.Dimmable as={Item.Group} dimmed={loading}>
+      <Dimmer inverted active={loading}>
+        <Loader inverted>Loading</Loader>
+      </Dimmer>
       {result.map(({ id, title, artist, album, duration }) => (
         <Item key={id}>
           <Item.Image size="small" src={album.cover_medium} />
@@ -108,7 +112,7 @@ function Result({ result, loading }) {
           </Item.Content>
         </Item>
       ))}
-    </Item.Group>
+    </Dimmer.Dimmable>
   );
 }
 

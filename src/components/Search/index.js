@@ -52,6 +52,7 @@ export default function Search({ debounce, request }) {
       query,
       data => dispatch({ type: SUCCESS, payload: data }),
       error => {
+        // eslint-disable-next-line no-console
         console.error(error);
         dispatch({ type: ERROR, error });
       },
