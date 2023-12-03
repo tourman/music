@@ -1,5 +1,6 @@
 import {
   Dimmer,
+  Header,
   Icon,
   Input,
   Item,
@@ -11,38 +12,41 @@ import {
 import PropTypes from 'prop-types';
 import { memo } from 'react';
 
-function Fallback() {
+function Fallback({ query }) {
   return (
-    <Item.Group>
-      {Array.from({ length: 3 }).map((_, index) => (
-        <Item key={index}>
-          <Item.Image
-            size="small"
-            src="https://react.semantic-ui.com/images/wireframe/white-image.png"
-          />
+    <>
+      <Message info>Looking for "{query}"...</Message>
+      <Item.Group>
+        {Array.from({ length: 3 }).map((_, index) => (
+          <Item key={index}>
+            <Item.Image
+              size="small"
+              src="https://react.semantic-ui.com/images/wireframe/white-image.png"
+            />
 
-          <Item.Content>
-            <Item.Header></Item.Header>
-            <Item.Meta>
-              <Loader active inline size="tiny" />
-            </Item.Meta>
-            <Item.Description>
-              <Loader active inline size="tiny" />
-            </Item.Description>
-          </Item.Content>
-        </Item>
-      ))}
-    </Item.Group>
+            <Item.Content>
+              <Item.Header></Item.Header>
+              <Item.Meta>
+                <Loader active inline size="tiny" />
+              </Item.Meta>
+              <Item.Description>
+                <Loader active inline size="tiny" />
+              </Item.Description>
+            </Item.Content>
+          </Item>
+        ))}
+      </Item.Group>
+    </>
   );
 }
 
-function ErrorMessage({ error }) {
+function ErrorMessage({ query, instance }) {
   return (
     <Message error>
       <Message.Header>
-        There was some errors with your submission
+        There was an error while searching for "{query}"
       </Message.Header>
-      <p>{error.toString()}</p>
+      <p>{instance.toString()}</p>
     </Message>
   );
 }
@@ -109,35 +113,40 @@ const Memo = memo(
   },
 );
 
-function Result({ loading, ...props }) {
+function Result({ loading, query, ...props }) {
   return (
-    <Dimmer.Dimmable as={Item.Group} dimmed={loading}>
+    <Dimmer.Dimmable dimmed={loading}>
       <Dimmer inverted active={loading}>
         <Loader inverted>Loading</Loader>
       </Dimmer>
+      {query && <Message success>Search results for "{query}"</Message>}
       <Memo {...props}>
-        {({ result }) =>
-          result.map(({ id, title, artist, album, duration }) => (
-            <Item key={id}>
-              <Item.Image size="small" src={album.cover_medium} />
-              <Item.Content>
-                <Item.Header>
-                  {artist.name} &mdash; {title}
-                </Item.Header>
-                <Item.Meta>
-                  <Icon name="step forward" />
-                  {transformDuration(duration)}
-                </Item.Meta>
-                <Item.Description>
-                  <Icon name="dot circle" />
-                  {album.title}
-                </Item.Description>
-                <Item.Extra>
-                  <Label as="a" icon="play" content="Play sample" />
-                </Item.Extra>
-              </Item.Content>
-            </Item>
-          ))
+        {({ items }) =>
+          !!items.length && (
+            <Item.Group>
+              {items.map(({ id, title, artist, album, duration }) => (
+                <Item key={id}>
+                  <Item.Image size="small" src={album.cover_medium} />
+                  <Item.Content>
+                    <Item.Header>
+                      {artist.name} &mdash; {title}
+                    </Item.Header>
+                    <Item.Meta>
+                      <Icon name="step forward" />
+                      {transformDuration(duration)}
+                    </Item.Meta>
+                    <Item.Description>
+                      <Icon name="dot circle" />
+                      {album.title}
+                    </Item.Description>
+                    <Item.Extra>
+                      <Label as="a" icon="play" content="Play sample" />
+                    </Item.Extra>
+                  </Item.Content>
+                </Item>
+              ))}
+            </Item.Group>
+          )
         }
       </Memo>
     </Dimmer.Dimmable>
@@ -146,6 +155,7 @@ function Result({ loading, ...props }) {
 
 export default function Search({
   value,
+  request,
   inputStatus,
   onChange,
   result,
@@ -163,12 +173,12 @@ export default function Search({
         onChange={onChange}
       />
 
-      {error && <ErrorMessage error={error} />}
-      {result === 'skeleton' ? (
-        <Fallback />
-      ) : result.length ? (
-        <Result {...{ result, loading }} />
-      ) : null}
+      {error && <ErrorMessage {...error} />}
+      {typeof result === 'string' ? (
+        <Fallback query={result} />
+      ) : (
+        <Result {...{ ...result, loading }} />
+      )}
     </Segment>
   );
 }
@@ -177,22 +187,25 @@ Search.propTypes = {
   value: PropTypes.string.isRequired,
   inputStatus: PropTypes.oneOf(['idle', 'loading', 'error']).isRequired,
   result: PropTypes.oneOfType([
-    PropTypes.oneOf(['skeleton']),
-    PropTypes.arrayOf(
-      PropTypes.shape({
-        id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
-          .isRequired,
-        title: PropTypes.string.isRequired,
-        artist: PropTypes.shape({
-          name: PropTypes.string.isRequired,
-        }).isRequired,
-        album: PropTypes.shape({
+    PropTypes.string,
+    PropTypes.shape({
+      query: PropTypes.string.isRequired,
+      items: PropTypes.arrayOf(
+        PropTypes.shape({
+          id: PropTypes.oneOfType([PropTypes.string, PropTypes.number])
+            .isRequired,
           title: PropTypes.string.isRequired,
-          cover_medium: PropTypes.string.isRequired,
-        }).isRequired,
-        duration: PropTypes.number.isRequired,
-      }),
-    ),
+          artist: PropTypes.shape({
+            name: PropTypes.string.isRequired,
+          }).isRequired,
+          album: PropTypes.shape({
+            title: PropTypes.string.isRequired,
+            cover_medium: PropTypes.string.isRequired,
+          }).isRequired,
+          duration: PropTypes.number.isRequired,
+        }),
+      ).isRequired,
+    }),
   ]).isRequired,
   loading: PropTypes.bool.isRequired,
   error: PropTypes.instanceOf(Error),

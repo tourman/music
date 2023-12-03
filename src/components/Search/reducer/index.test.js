@@ -6,7 +6,6 @@ describe('Search: reducer', () => {
     'query-a': new Error('Error for query-a'),
     'query-b': new Error('Error for query-b'),
   };
-  const emptyArray = [];
   const results = {
     'query-a': Object.assign(Array(2), { id: 'query-a' }),
     'query-b': Object.assign(Array(3), { id: 'query-b' }),
@@ -14,15 +13,9 @@ describe('Search: reducer', () => {
   describe.each([
     {
       state: {
-        inner: {
-          results: {
-            'query-b': results['query-b'],
-          },
-          errors: {},
-        },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: results['query-b'],
+          result: { query: 'query-b', items: results['query-b'] },
           status: { loading: true },
           error: null,
         },
@@ -31,15 +24,9 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: 'query-b' },
       expected: {
-        inner: {
-          results: {
-            'query-b': results['query-b'],
-          },
-          errors: {},
-        },
         display: {
           input: { value: 'query-b', status: 'idle' },
-          result: results['query-b'],
+          result: { query: 'query-b', items: results['query-b'] },
           status: { loading: false },
           error: null,
         },
@@ -49,22 +36,23 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: 'skeleton',
+          result: 'query-b',
           status: { loading: false },
           error: null,
         },
         network: { request: 'query-b' },
         timer: { debounce: 'query-a' },
       },
-      action: { type: ERROR, error: errors['query-b'] },
+      action: {
+        type: ERROR,
+        error: errors['query-b'],
+      },
       expected: {
-        inner: { results: {}, errors: { 'query-b': errors['query-b'] } },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: 'skeleton',
+          result: 'query-a',
           status: { loading: false },
           error: null,
         },
@@ -74,10 +62,9 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: 'query-a', status: 'idle' },
-          result: emptyArray,
+          result: { query: '', items: [] },
           status: { loading: false },
           error: null,
         },
@@ -86,10 +73,9 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: '' },
       expected: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: '', status: 'idle' },
-          result: emptyArray,
+          result: { query: '', items: [] },
           status: { loading: false },
           error: null,
         },
@@ -99,10 +85,9 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: 'skeleton',
+          result: 'query-a',
           status: { loading: false },
           error: null,
         },
@@ -111,10 +96,9 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: '' },
       expected: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: '', status: 'idle' },
-          result: [],
+          result: { query: '', items: [] },
           status: { loading: false },
           error: null,
         },
@@ -124,32 +108,20 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: {
-          results: {
-            'query-b': results['query-b'],
-          },
-          errors: {},
-        },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: results['query-b'],
+          result: { query: 'query-b', items: results['query-b'] },
           status: { loading: true },
           error: null,
         },
         network: { request: 'query-a' },
         timer: { debounce: null },
       },
-      action: { type: SUCCESS, payload: emptyArray },
+      action: { type: SUCCESS, payload: [] },
       expected: {
-        inner: {
-          results: {
-            'query-a': emptyArray,
-          },
-          errors: {},
-        },
         display: {
           input: { value: 'query-a', status: 'idle' },
-          result: emptyArray,
+          result: { query: 'query-a', items: [] },
           status: { loading: false },
           error: null,
         },
@@ -159,15 +131,9 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: {
-          results: {
-            'query-b': results['query-b'],
-          },
-          errors: {},
-        },
         display: {
           input: { value: 'query-a', status: 'idle' },
-          result: results['query-b'],
+          result: { query: 'query-b', items: results['query-b'] },
           status: { loading: false },
           error: null,
         },
@@ -176,10 +142,9 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: '' },
       expected: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: '', status: 'idle' },
-          result: [],
+          result: { query: '', items: [] },
           status: { loading: false },
           error: null,
         },
@@ -189,15 +154,9 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: {
-          results: {
-            'query-a': results['query-a'],
-          },
-          errors: {},
-        },
         display: {
           input: { value: 'query-a', status: 'idle' },
-          result: results['query-a'],
+          result: { query: 'query-a', items: results['query-a'] },
           status: { loading: false },
           error: null,
         },
@@ -206,10 +165,9 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: '' },
       expected: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: '', status: 'idle' },
-          result: [],
+          result: { query: '', items: [] },
           status: { loading: false },
           error: null,
         },
@@ -219,24 +177,22 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: { results: {}, errors: { 'query-a': errors['query-a'] } },
         display: {
           input: { value: 'query-a', status: 'error' },
-          result: emptyArray,
+          result: { query: 'query-a', items: [] },
           status: { loading: false },
-          error: errors['query-a'],
+          error: { query: 'query-a', instance: errors['query-a'] },
         },
         network: { request: null },
         timer: { debounce: null },
       },
       action: { type: QUERY, query: 'query-b' },
       expected: {
-        inner: { results: {}, errors: { 'query-a': errors['query-a'] } },
         display: {
           input: { value: 'query-b', status: 'error' },
-          result: emptyArray,
+          result: { query: 'query-a', items: [] },
           status: { loading: false },
-          error: errors['query-a'],
+          error: { query: 'query-a', instance: errors['query-a'] },
         },
         network: { request: null },
         timer: { debounce: 'query-b' },
@@ -244,10 +200,9 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: 'query-a', status: 'idle' },
-          result: [],
+          result: { query: '', items: [] },
           status: { loading: false },
           error: null,
         },
@@ -256,10 +211,9 @@ describe('Search: reducer', () => {
       },
       action: { type: DEBOUNCE },
       expected: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: 'skeleton',
+          result: 'query-a',
           status: { loading: false },
           error: null,
         },
@@ -269,10 +223,9 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: 'skeleton',
+          result: 'query-b',
           status: { loading: false },
           error: null,
         },
@@ -281,10 +234,9 @@ describe('Search: reducer', () => {
       },
       action: { type: DEBOUNCE },
       expected: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: 'skeleton',
+          result: 'query-a',
           status: { loading: false },
           error: null,
         },
@@ -294,10 +246,9 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: 'skeleton',
+          result: 'query-b',
           status: { loading: false },
           error: null,
         },
@@ -306,15 +257,9 @@ describe('Search: reducer', () => {
       },
       action: { type: SUCCESS, payload: results['query-b'] },
       expected: {
-        inner: {
-          results: {
-            'query-b': results['query-b'],
-          },
-          errors: {},
-        },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: 'skeleton',
+          result: 'query-a',
           status: { loading: false },
           error: null,
         },
@@ -324,10 +269,9 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: 'query-a', status: 'idle' },
-          result: emptyArray,
+          result: { query: '', items: [] },
           status: { loading: false },
           error: null,
         },
@@ -336,10 +280,9 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: 'query-b' },
       expected: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: 'query-b', status: 'idle' },
-          result: emptyArray,
+          result: { query: '', items: [] },
           status: { loading: false },
           error: null,
         },
@@ -349,10 +292,9 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: 'skeleton',
+          result: 'query-a',
           status: { loading: false },
           error: null,
         },
@@ -361,10 +303,9 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: 'query-b' },
       expected: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: 'query-b', status: 'loading' },
-          result: 'skeleton',
+          result: 'query-a',
           status: { loading: false },
           error: null,
         },
@@ -374,15 +315,9 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: {
-          results: {
-            'query-b': results['query-b'],
-          },
-          errors: {},
-        },
         display: {
           input: { value: 'query-a', status: 'idle' },
-          result: results['query-b'],
+          result: { query: 'query-b', items: results['query-b'] },
           status: { loading: false },
           error: null,
         },
@@ -391,15 +326,9 @@ describe('Search: reducer', () => {
       },
       action: { type: DEBOUNCE },
       expected: {
-        inner: {
-          results: {
-            'query-b': results['query-b'],
-          },
-          errors: {},
-        },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: results['query-b'],
+          result: { query: 'query-b', items: results['query-b'] },
           status: { loading: true },
           error: null,
         },
@@ -409,10 +338,9 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: '', status: 'idle' },
-          result: emptyArray,
+          result: { query: '', items: [] },
           status: { loading: false },
           error: null,
         },
@@ -421,10 +349,9 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: 'query-a' },
       expected: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: 'query-a', status: 'idle' },
-          result: emptyArray,
+          result: { query: '', items: [] },
           status: { loading: false },
           error: null,
         },
@@ -434,27 +361,20 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: 'skeleton',
+          result: 'query-b',
           status: { loading: false },
           error: null,
         },
         network: { request: 'query-b' },
         timer: { debounce: 'query-a' },
       },
-      action: { type: SUCCESS, payload: emptyArray },
+      action: { type: SUCCESS, payload: [] },
       expected: {
-        inner: {
-          results: {
-            'query-b': emptyArray,
-          },
-          errors: {},
-        },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: 'skeleton',
+          result: 'query-a',
           status: { loading: false },
           error: null,
         },
@@ -464,36 +384,25 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: {
-          results: {
-            'query-b': results['query-b'],
-          },
-          errors: {},
-        },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: results['query-b'],
+          result: { query: 'query-b', items: results['query-b'] },
           status: { loading: true },
           error: null,
         },
         network: { request: 'query-a' },
         timer: { debounce: null },
       },
-      action: { type: ERROR, error: errors['query-a'] },
+      action: {
+        type: ERROR,
+        error: errors['query-a'],
+      },
       expected: {
-        inner: {
-          results: {
-            'query-b': results['query-b'],
-          },
-          errors: {
-            'query-a': errors['query-a'],
-          },
-        },
         display: {
           input: { value: 'query-a', status: 'error' },
-          result: results['query-b'],
+          result: { query: 'query-b', items: results['query-b'] },
           status: { loading: false },
-          error: errors['query-a'],
+          error: { query: 'query-a', instance: errors['query-a'] },
         },
         network: { request: null },
         timer: { debounce: null },
@@ -501,10 +410,9 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: '', status: 'idle' },
-          result: emptyArray,
+          result: { query: '', items: [] },
           status: { loading: false },
           error: null,
         },
@@ -513,10 +421,9 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: 'query-b' },
       expected: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: 'query-b', status: 'idle' },
-          result: emptyArray,
+          result: { query: '', items: [] },
           status: { loading: false },
           error: null,
         },
@@ -526,15 +433,9 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: {
-          results: {
-            'query-b': results['query-b'],
-          },
-          errors: {},
-        },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: results['query-b'],
+          result: { query: 'query-b', items: results['query-b'] },
           status: { loading: true },
           error: null,
         },
@@ -543,10 +444,9 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: '' },
       expected: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: '', status: 'idle' },
-          result: [],
+          result: { query: '', items: [] },
           status: { loading: false },
           error: null,
         },
@@ -556,10 +456,9 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: 'skeleton',
+          result: 'query-b',
           status: { loading: false },
           error: null,
         },
@@ -568,10 +467,9 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: '' },
       expected: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: '', status: 'idle' },
-          result: [],
+          result: { query: '', items: [] },
           status: { loading: false },
           error: null,
         },
@@ -581,15 +479,9 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: {
-          results: {
-            'query-b': results['query-b'],
-          },
-          errors: {},
-        },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: results['query-b'],
+          result: { query: 'query-b', items: results['query-b'] },
           status: { loading: true },
           error: null,
         },
@@ -598,15 +490,9 @@ describe('Search: reducer', () => {
       },
       action: { type: SUCCESS, payload: results['query-a'] },
       expected: {
-        inner: {
-          results: {
-            'query-a': results['query-a'],
-          },
-          errors: {},
-        },
         display: {
           input: { value: 'query-a', status: 'idle' },
-          result: results['query-a'],
+          result: { query: 'query-a', items: results['query-a'] },
           status: { loading: false },
           error: null,
         },
@@ -616,27 +502,20 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: {
-          results: {},
-          errors: {
-            'query-a': errors['query-a'],
-          },
-        },
         display: {
           input: { value: 'query-a', status: 'error' },
-          result: emptyArray,
+          result: { query: 'query-a', items: [] },
           status: { loading: false },
-          error: errors['query-a'],
+          error: { query: 'query-a', instance: errors['query-a'] },
         },
         network: { request: null },
         timer: { debounce: null },
       },
       action: { type: QUERY, query: '' },
       expected: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: '', status: 'idle' },
-          result: emptyArray,
+          result: { query: '', items: [] },
           status: { loading: false },
           error: null,
         },
@@ -646,15 +525,9 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: {
-          results: {
-            'query-a': results['query-a'],
-          },
-          errors: {},
-        },
         display: {
           input: { value: 'query-a', status: 'idle' },
-          result: results['query-a'],
+          result: { query: 'query-a', items: results['query-a'] },
           status: { loading: false },
           error: null,
         },
@@ -663,15 +536,9 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: 'query-b' },
       expected: {
-        inner: {
-          results: {
-            'query-a': results['query-a'],
-          },
-          errors: {},
-        },
         display: {
           input: { value: 'query-b', status: 'idle' },
-          result: results['query-a'],
+          result: { query: 'query-a', items: results['query-a'] },
           status: { loading: false },
           error: null,
         },
@@ -681,27 +548,20 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: {
-          results: {},
-          errors: {
-            'query-b': errors['query-b'],
-          },
-        },
         display: {
           input: { value: 'query-a', status: 'error' },
-          result: emptyArray,
+          result: { query: '', items: [] },
           status: { loading: false },
-          error: errors['query-b'],
+          error: { query: 'query-b', instance: errors['query-b'] },
         },
         network: { request: null },
         timer: { debounce: 'query-a' },
       },
       action: { type: QUERY, query: '' },
       expected: {
-        inner: { results: {}, errors: {} },
         display: {
           input: { value: '', status: 'idle' },
-          result: emptyArray,
+          result: { query: '', items: [] },
           status: { loading: false },
           error: null,
         },
@@ -711,34 +571,22 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: {
-          results: {},
-          errors: {
-            'query-b': errors['query-b'],
-          },
-        },
         display: {
           input: { value: 'query-a', status: 'error' },
-          result: emptyArray,
+          result: { query: 'query-b', items: [] },
           status: { loading: false },
-          error: errors['query-b'],
+          error: { query: 'query-b', instance: errors['query-b'] },
         },
         network: { request: null },
         timer: { debounce: 'query-a' },
       },
       action: { type: QUERY, query: 'query-b' },
       expected: {
-        inner: {
-          results: {},
-          errors: {
-            'query-b': errors['query-b'],
-          },
-        },
         display: {
           input: { value: 'query-b', status: 'error' },
-          result: emptyArray,
+          result: { query: 'query-b', items: [] },
           status: { loading: false },
-          error: errors['query-b'],
+          error: { query: 'query-b', instance: errors['query-b'] },
         },
         network: { request: null },
         timer: { debounce: null },
@@ -746,32 +594,25 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: {
-          results: {},
-          errors: {},
-        },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: 'skeleton',
+          result: 'query-a',
           status: { loading: false },
           error: null,
         },
         network: { request: 'query-a' },
         timer: { debounce: null },
       },
-      action: { type: ERROR, error: errors['query-a'] },
+      action: {
+        type: ERROR,
+        error: errors['query-a'],
+      },
       expected: {
-        inner: {
-          results: {},
-          errors: {
-            'query-a': errors['query-a'],
-          },
-        },
         display: {
           input: { value: 'query-a', status: 'error' },
-          result: [],
+          result: { query: 'query-a', items: [] },
           status: { loading: false },
-          error: errors['query-a'],
+          error: { query: 'query-a', instance: errors['query-a'] },
         },
         network: { request: null },
         timer: { debounce: null },
@@ -779,32 +620,20 @@ describe('Search: reducer', () => {
     },
     {
       state: {
-        inner: {
-          results: {},
-          errors: {
-            'query-b': errors['query-b'],
-          },
-        },
         display: {
           input: { value: 'query-a', status: 'error' },
-          result: [],
+          result: { query: '', items: [] },
           status: { loading: false },
-          error: errors['query-b'],
+          error: { query: 'query-b', instance: errors['query-b'] },
         },
         network: { request: null },
         timer: { debounce: 'query-a' },
       },
       action: { type: DEBOUNCE },
       expected: {
-        inner: {
-          results: {},
-          errors: {
-            'query-b': errors['query-b'],
-          },
-        },
         display: {
           input: { value: 'query-a', status: 'loading' },
-          result: 'skeleton',
+          result: 'query-a',
           status: { loading: false },
           error: null,
         },

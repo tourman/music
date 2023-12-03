@@ -6,10 +6,9 @@ import PropTypes from 'prop-types';
 
 export default function Search({ debounce, request }) {
   const [state, dispatch] = useReducer(reducer, {
-    inner: { results: {}, errors: {} },
     display: {
       input: { value: '', status: 'idle' },
-      result: [],
+      result: { query: '', items: [] },
       status: { loading: false },
       error: null,
     },
@@ -91,6 +90,9 @@ Search.defaultProps = {
   })(),
   request: (() => {
     let currentQuery;
+    /**
+     * https://rapidapi.com/deezerdevs/api/deezer-1
+     */
     return (query, onSuccess = () => {}, onError = () => {}) => {
       currentQuery = query;
       if (!query) {
