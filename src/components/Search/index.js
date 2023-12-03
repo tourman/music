@@ -107,7 +107,17 @@ Search.defaultProps = {
           'X-RapidAPI-Host': 'deezerdevs-deezer.p.rapidapi.com',
         },
       };
-      fetch(url, options)
+      Promise.resolve()
+        .then(
+          () =>
+            new Promise(resolve =>
+              setTimeout(
+                resolve,
+                process.env.NODE_ENV === 'development' ? 1000 : 0,
+              ),
+            ),
+        )
+        .then(() => fetch(url, options))
         .then(response => response.json())
         .then(({ data }) => data)
         .then(

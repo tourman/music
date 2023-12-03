@@ -9,6 +9,7 @@ import {
   Segment,
 } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
+import { memo } from 'react';
 
 function Fallback() {
   return (
@@ -85,33 +86,60 @@ function transformDuration(duration) {
   return `${transformInt(minutes)}:${transformInt(seconds)}`;
 }
 
-function Result({ result, loading }) {
+function shallowEqual(obj1, obj2) {
+  const keys1 = Object.keys(obj1);
+  const keys2 = Object.keys(obj2);
+  if (keys1.length !== keys2.length) {
+    return false;
+  }
+  for (const key of keys1) {
+    if (obj1[key] !== obj2[key]) {
+      return false;
+    }
+  }
+  return true;
+}
+
+const Memo = memo(
+  function Memo({ children, ...props }) {
+    return children(props);
+  },
+  ({ children: nullA, ...prev }, { children: nullB, ...next }) => {
+    return shallowEqual(prev, next);
+  },
+);
+
+function Result({ loading, ...props }) {
   return (
     <Dimmer.Dimmable as={Item.Group} dimmed={loading}>
       <Dimmer inverted active={loading}>
         <Loader inverted>Loading</Loader>
       </Dimmer>
-      {result.map(({ id, title, artist, album, duration }) => (
-        <Item key={id}>
-          <Item.Image size="small" src={album.cover_medium} />
-          <Item.Content>
-            <Item.Header>
-              {artist.name} &mdash; {title}
-            </Item.Header>
-            <Item.Meta>
-              <Icon name="step forward" />
-              {transformDuration(duration)}
-            </Item.Meta>
-            <Item.Description>
-              <Icon name="dot circle" />
-              {album.title}
-            </Item.Description>
-            <Item.Extra>
-              <Label as="a" icon="play" content="Play sample" />
-            </Item.Extra>
-          </Item.Content>
-        </Item>
-      ))}
+      <Memo {...props}>
+        {({ result }) =>
+          result.map(({ id, title, artist, album, duration }) => (
+            <Item key={id}>
+              <Item.Image size="small" src={album.cover_medium} />
+              <Item.Content>
+                <Item.Header>
+                  {artist.name} &mdash; {title}
+                </Item.Header>
+                <Item.Meta>
+                  <Icon name="step forward" />
+                  {transformDuration(duration)}
+                </Item.Meta>
+                <Item.Description>
+                  <Icon name="dot circle" />
+                  {album.title}
+                </Item.Description>
+                <Item.Extra>
+                  <Label as="a" icon="play" content="Play sample" />
+                </Item.Extra>
+              </Item.Content>
+            </Item>
+          ))
+        }
+      </Memo>
     </Dimmer.Dimmable>
   );
 }
