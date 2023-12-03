@@ -13,6 +13,7 @@ describe('Search: reducer', () => {
   describe.each([
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: { query: 'query-b', items: results['query-b'] },
@@ -24,6 +25,7 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: 'query-b' },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-b', status: 'idle' },
           result: { query: 'query-b', items: results['query-b'] },
@@ -36,6 +38,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: 'query-b',
@@ -50,6 +53,7 @@ describe('Search: reducer', () => {
         error: errors['query-b'],
       },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: 'query-a',
@@ -62,6 +66,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'idle' },
           result: { query: '', items: [] },
@@ -73,6 +78,7 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: '' },
       expected: {
+        cache: {},
         display: {
           input: { value: '', status: 'idle' },
           result: { query: '', items: [] },
@@ -85,6 +91,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: 'query-a',
@@ -96,6 +103,7 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: '' },
       expected: {
+        cache: {},
         display: {
           input: { value: '', status: 'idle' },
           result: { query: '', items: [] },
@@ -108,6 +116,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: { query: 'query-b', items: results['query-b'] },
@@ -119,6 +128,7 @@ describe('Search: reducer', () => {
       },
       action: { type: SUCCESS, payload: [] },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'idle' },
           result: { query: 'query-a', items: [] },
@@ -131,6 +141,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'idle' },
           result: { query: 'query-b', items: results['query-b'] },
@@ -142,6 +153,7 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: '' },
       expected: {
+        cache: {},
         display: {
           input: { value: '', status: 'idle' },
           result: { query: '', items: [] },
@@ -154,6 +166,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'idle' },
           result: { query: 'query-a', items: results['query-a'] },
@@ -165,6 +178,7 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: '' },
       expected: {
+        cache: {},
         display: {
           input: { value: '', status: 'idle' },
           result: { query: '', items: [] },
@@ -177,6 +191,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'error' },
           result: { query: 'query-a', items: [] },
@@ -188,6 +203,7 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: 'query-b' },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-b', status: 'error' },
           result: { query: 'query-a', items: [] },
@@ -200,6 +216,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'idle' },
           result: { query: '', items: [] },
@@ -211,6 +228,7 @@ describe('Search: reducer', () => {
       },
       action: { type: DEBOUNCE },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: 'query-a',
@@ -223,6 +241,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: 'query-b',
@@ -234,6 +253,7 @@ describe('Search: reducer', () => {
       },
       action: { type: DEBOUNCE },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: 'query-a',
@@ -246,6 +266,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: 'query-b',
@@ -257,6 +278,7 @@ describe('Search: reducer', () => {
       },
       action: { type: SUCCESS, payload: results['query-b'] },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: 'query-a',
@@ -269,6 +291,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'idle' },
           result: { query: '', items: [] },
@@ -280,6 +303,7 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: 'query-b' },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-b', status: 'idle' },
           result: { query: '', items: [] },
@@ -292,6 +316,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: 'query-a',
@@ -303,6 +328,7 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: 'query-b' },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-b', status: 'loading' },
           result: 'query-a',
@@ -315,6 +341,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'idle' },
           result: { query: 'query-b', items: results['query-b'] },
@@ -326,6 +353,7 @@ describe('Search: reducer', () => {
       },
       action: { type: DEBOUNCE },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: { query: 'query-b', items: results['query-b'] },
@@ -338,6 +366,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: '', status: 'idle' },
           result: { query: '', items: [] },
@@ -349,6 +378,7 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: 'query-a' },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'idle' },
           result: { query: '', items: [] },
@@ -361,6 +391,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: 'query-b',
@@ -372,6 +403,7 @@ describe('Search: reducer', () => {
       },
       action: { type: SUCCESS, payload: [] },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: 'query-a',
@@ -384,6 +416,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: { query: 'query-b', items: results['query-b'] },
@@ -398,6 +431,7 @@ describe('Search: reducer', () => {
         error: errors['query-a'],
       },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'error' },
           result: { query: 'query-b', items: results['query-b'] },
@@ -410,6 +444,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: '', status: 'idle' },
           result: { query: '', items: [] },
@@ -421,6 +456,7 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: 'query-b' },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-b', status: 'idle' },
           result: { query: '', items: [] },
@@ -433,6 +469,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: { query: 'query-b', items: results['query-b'] },
@@ -444,6 +481,7 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: '' },
       expected: {
+        cache: {},
         display: {
           input: { value: '', status: 'idle' },
           result: { query: '', items: [] },
@@ -456,6 +494,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: 'query-b',
@@ -467,6 +506,7 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: '' },
       expected: {
+        cache: {},
         display: {
           input: { value: '', status: 'idle' },
           result: { query: '', items: [] },
@@ -479,6 +519,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: { query: 'query-b', items: results['query-b'] },
@@ -490,6 +531,7 @@ describe('Search: reducer', () => {
       },
       action: { type: SUCCESS, payload: results['query-a'] },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'idle' },
           result: { query: 'query-a', items: results['query-a'] },
@@ -502,6 +544,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'error' },
           result: { query: 'query-a', items: [] },
@@ -513,6 +556,7 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: '' },
       expected: {
+        cache: {},
         display: {
           input: { value: '', status: 'idle' },
           result: { query: '', items: [] },
@@ -525,6 +569,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'idle' },
           result: { query: 'query-a', items: results['query-a'] },
@@ -536,6 +581,7 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: 'query-b' },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-b', status: 'idle' },
           result: { query: 'query-a', items: results['query-a'] },
@@ -548,6 +594,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'error' },
           result: { query: '', items: [] },
@@ -559,6 +606,7 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: '' },
       expected: {
+        cache: {},
         display: {
           input: { value: '', status: 'idle' },
           result: { query: '', items: [] },
@@ -571,6 +619,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'error' },
           result: { query: 'query-b', items: [] },
@@ -582,6 +631,7 @@ describe('Search: reducer', () => {
       },
       action: { type: QUERY, query: 'query-b' },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-b', status: 'error' },
           result: { query: 'query-b', items: [] },
@@ -594,6 +644,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: 'query-a',
@@ -608,6 +659,7 @@ describe('Search: reducer', () => {
         error: errors['query-a'],
       },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'error' },
           result: { query: 'query-a', items: [] },
@@ -620,6 +672,7 @@ describe('Search: reducer', () => {
     },
     {
       state: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'error' },
           result: { query: '', items: [] },
@@ -631,6 +684,7 @@ describe('Search: reducer', () => {
       },
       action: { type: DEBOUNCE },
       expected: {
+        cache: {},
         display: {
           input: { value: 'query-a', status: 'loading' },
           result: 'query-a',

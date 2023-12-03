@@ -16,8 +16,6 @@ Action:       QUERY, SUCCESS, ERROR, DEBOUNCE
 # Payloads
 AQuery:       -, empty, query-a, query-b
 ASuccess:     -, empty, full
-ACacheQueryA: -
-ACacheQueryB: -
 
 # Combination to check out
 # SDIValue:     query-a
