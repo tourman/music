@@ -7,6 +7,8 @@ SDSLoading:   true, false
 SDEMessage:   -, query-a, query-b
 SNRequest:    -, query-a, query-b
 STStatus:     -, query-a
+SCacheQueryA: false
+SCacheQueryB: false
 # display actions: QUERY
 # network actions: SUCCESS, ERROR
 # debounce timer actions: DEBOUNCE
@@ -14,6 +16,8 @@ Action:       QUERY, SUCCESS, ERROR, DEBOUNCE
 # Payloads
 AQuery:       -, empty, query-a, query-b
 ASuccess:     -, empty, full
+ACacheQueryA: -
+ACacheQueryB: -
 
 # Combination to check out
 # SDIValue:     query-a
