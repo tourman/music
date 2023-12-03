@@ -74,6 +74,16 @@ function defaultItem() {
   );
 }
 
+function transformInt(int) {
+  return int < 10 ? `0${int}` : `${int}`;
+}
+
+function transformDuration(duration) {
+  const minutes = Math.floor(duration / 60);
+  const seconds = duration % 60;
+  return `${transformInt(minutes)}:${transformInt(seconds)}`;
+}
+
 function Result({ result, loading }) {
   return (
     <Item.Group>
@@ -85,7 +95,8 @@ function Result({ result, loading }) {
               {artist.name} &mdash; {title}
             </Item.Header>
             <Item.Meta>
-              <Icon name="step forward" /> {duration}
+              <Icon name="step forward" />
+              {transformDuration(duration)}
             </Item.Meta>
             <Item.Description>
               <Icon name="dot circle" />
