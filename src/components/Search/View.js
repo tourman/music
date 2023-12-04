@@ -20,6 +20,7 @@ import React, {
   useState,
   useTransition,
 } from 'react';
+import flatMemoize from 'flat-memoize';
 
 function Fallback({ query }) {
   return (
@@ -122,6 +123,33 @@ const Memo = memo(
   },
 );
 
+const cache = new Map();
+
+function uniqueId() {
+  return Math.floor(Math.random() * 2 ** 32).toString(16);
+}
+
+const convert = flatMemoize(() => ({ id: uniqueId() }));
+
+function Memoize({ children, ...props }) {
+  const thisKey = convert(props);
+  if (!cache.has(thisKey)) {
+    cache.set(thisKey, children(props));
+  }
+  const KeepMargin = 'div';
+  return [...cache.entries()].map(([key, value]) => (
+    <div
+      key={key.id}
+      style={{
+        display: key === thisKey ? 'block' : 'none',
+      }}
+    >
+      <KeepMargin />
+      {value}
+    </div>
+  ));
+}
+
 function Transit({ items: suspendedItems, children }) {
   const [, startTransition] = useTransition();
   const [items, setItems] = useState(suspendedItems);
@@ -140,10 +168,20 @@ function DivideTransition({ children }) {
   return children();
 }
 
+const memoizationOptions = ['Nothing', 'Memoize'].map(x => ({
+  text: x,
+  value: x,
+}));
+
 const performanceOptions = ['Transit', 'Deferred', 'Nothing'].map(x => ({
   text: x,
   value: x,
 }));
+
+const memoizationMap = {
+  Nothing: Memo,
+  Memoize,
+};
 
 const performanceMap = {
   Transit,
@@ -152,8 +190,17 @@ const performanceMap = {
 };
 
 function Result({ loading, query, items }) {
+  const [memoization, setMemoization] = useState('Nothing');
+  const onChangeMemoization = useCallback(
+    (_, { value }) => setMemoization(value),
+    [],
+  );
+  const Memoization = memoizationMap[memoization];
   const [performance, setPerformance] = useState('Transit');
-  const onChange = useCallback((_, { value }) => setPerformance(value), []);
+  const onChangePerformance = useCallback(
+    (_, { value }) => setPerformance(value),
+    [],
+  );
   const Performance = performanceMap[performance];
   return (
     <Dimmer.Dimmable dimmed={loading}>
@@ -162,13 +209,30 @@ function Result({ loading, query, items }) {
       </Dimmer>
       <Divider />
       <Grid>
-        <Grid.Column width={10}>
+        <Grid.Column width={4}>
           <Grid.Row>
             {query && (
               <Message size="mini" success>
                 Search results for "{query}"
               </Message>
             )}
+          </Grid.Row>
+        </Grid.Column>
+        <Grid.Column width={2} verticalAlign="middle">
+          <Grid.Row>
+            <Label pointing="right" size="mini">
+              Choose memoization
+            </Label>
+          </Grid.Row>
+        </Grid.Column>
+        <Grid.Column width={4}>
+          <Grid.Row>
+            <Select
+              fluid
+              options={memoizationOptions}
+              onChange={onChangeMemoization}
+              value={memoization}
+            />
           </Grid.Row>
         </Grid.Column>
         <Grid.Column width={2} verticalAlign="middle">
@@ -183,7 +247,7 @@ function Result({ loading, query, items }) {
             <Select
               fluid
               options={performanceOptions}
-              onChange={onChange}
+              onChange={onChangePerformance}
               value={performance}
             />
           </Grid.Row>
@@ -193,7 +257,7 @@ function Result({ loading, query, items }) {
       <Performance items={items}>
         {({ items }) =>
           !!items.length && (
-            <Memo items={items}>
+            <Memoization items={items}>
               {({ items }) => (
                 <Item.Group>
                   {items.map(({ id, title, artist, album, duration }) => (
@@ -231,7 +295,7 @@ function Result({ loading, query, items }) {
                   ))}
                 </Item.Group>
               )}
-            </Memo>
+            </Memoization>
           )
         }
       </Performance>
