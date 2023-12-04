@@ -1,5 +1,7 @@
 import {
   Dimmer,
+  Divider,
+  Grid,
   Icon,
   Input,
   Item,
@@ -7,9 +9,17 @@ import {
   Loader,
   Message,
   Segment,
+  Select,
 } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
-import { memo } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useDeferredValue,
+  useEffect,
+  useState,
+  useTransition,
+} from 'react';
 
 function Fallback({ query }) {
   return (
@@ -112,42 +122,119 @@ const Memo = memo(
   },
 );
 
-function Result({ loading, query, ...props }) {
+function Transit({ items: suspendedItems, children }) {
+  const [, startTransition] = useTransition();
+  const [items, setItems] = useState(suspendedItems);
+  useEffect(() => {
+    startTransition(() => setItems(suspendedItems));
+  }, [suspendedItems, startTransition]);
+  return children({ items });
+}
+
+function Deferred({ items: suspendedItems, children }) {
+  const items = useDeferredValue(suspendedItems);
+  return children({ items });
+}
+
+function DivideTransition({ children }) {
+  return children();
+}
+
+const performanceOptions = ['Transit', 'Deferred', 'Nothing'].map(x => ({
+  text: x,
+  value: x,
+}));
+
+const performanceMap = {
+  Transit,
+  Deferred,
+  Nothing: Memo,
+};
+
+function Result({ loading, query, items }) {
+  const [performance, setPerformance] = useState('Transit');
+  const onChange = useCallback((_, { value }) => setPerformance(value), []);
+  const Performance = performanceMap[performance];
   return (
     <Dimmer.Dimmable dimmed={loading}>
       <Dimmer inverted active={loading}>
         <Loader inverted>Loading</Loader>
       </Dimmer>
-      {query && <Message success>Search results for "{query}"</Message>}
-      <Memo {...props}>
+      <Divider />
+      <Grid>
+        <Grid.Column width={10}>
+          <Grid.Row>
+            {query && (
+              <Message size="mini" success>
+                Search results for "{query}"
+              </Message>
+            )}
+          </Grid.Row>
+        </Grid.Column>
+        <Grid.Column width={2} verticalAlign="middle">
+          <Grid.Row>
+            <Label pointing="right" size="mini">
+              Choose performance
+            </Label>
+          </Grid.Row>
+        </Grid.Column>
+        <Grid.Column width={4}>
+          <Grid.Row>
+            <Select
+              fluid
+              options={performanceOptions}
+              onChange={onChange}
+              value={performance}
+            />
+          </Grid.Row>
+        </Grid.Column>
+      </Grid>
+      <Divider />
+      <Performance items={items}>
         {({ items }) =>
           !!items.length && (
-            <Item.Group>
-              {items.map(({ id, title, artist, album, duration }) => (
-                <Item key={id}>
-                  <Item.Image size="small" src={album.cover_medium} />
-                  <Item.Content>
-                    <Item.Header>
-                      {artist.name} &mdash; {title}
-                    </Item.Header>
-                    <Item.Meta>
-                      <Icon name="step forward" />
-                      {transformDuration(duration)}
-                    </Item.Meta>
-                    <Item.Description>
-                      <Icon name="dot circle" />
-                      {album.title}
-                    </Item.Description>
-                    <Item.Extra>
-                      <Label as="a" icon="play" content="Play sample" />
-                    </Item.Extra>
-                  </Item.Content>
-                </Item>
-              ))}
-            </Item.Group>
+            <Memo items={items}>
+              {({ items }) => (
+                <Item.Group>
+                  {items.map(({ id, title, artist, album, duration }) => (
+                    <DivideTransition key={id}>
+                      {() => {
+                        // const start = performance.now();
+                        // while (performance.now() - start < 3) {}
+                        return (
+                          <Item key={id}>
+                            <Item.Image size="small" src={album.cover_medium} />
+                            <Item.Content>
+                              <Item.Header>
+                                {artist.name} &mdash; {title}
+                              </Item.Header>
+                              <Item.Meta>
+                                <Icon name="play circle" />
+                                <span>{transformDuration(duration)}</span>
+                              </Item.Meta>
+                              <Item.Description>
+                                <Icon name="dot circle" />
+                                {album.title}
+                              </Item.Description>
+                              <Item.Extra>
+                                <Label
+                                  as="a"
+                                  icon="play"
+                                  content="Play sample"
+                                />
+                              </Item.Extra>
+                            </Item.Content>
+                          </Item>
+                        );
+                      }}
+                    </DivideTransition>
+                  ))}
+                </Item.Group>
+              )}
+            </Memo>
           )
         }
-      </Memo>
+      </Performance>
     </Dimmer.Dimmable>
   );
 }
